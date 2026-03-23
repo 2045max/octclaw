@@ -5,8 +5,8 @@ OCTCLAW_VERSION="2.0.0"
 OCTCLAW_STATE="${OCTCLAW_STATE_DIR:-$HOME/.octclaw}"
 OCTCLAW_CONFIG="$OCTCLAW_STATE/config.json"
 
-# Resolve lib dir (works with symlinks)
-OCT_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")")" && pwd)"
+# Resolve lib dir - use install directory
+OCT_ROOT="${OCTCLAW_STATE_DIR:-$HOME/.octclaw}"
 
 source "$OCT_ROOT/lib/utils.sh"
 source "$OCT_ROOT/lib/config.sh"

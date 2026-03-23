@@ -39,6 +39,8 @@ main() {
   local bin_dir="${HOME}/.local/bin"
   mkdir -p "$bin_dir"
   cp "$tmp_dir/octclaw/oct" "$bin_dir/"
+  # Fix OCT_ROOT to point to install_dir instead of bin_dir
+  sed -i.bak 's|^OCT_ROOT=.*|OCT_ROOT="${HOME}/.octclaw"|' "$bin_dir/oct"
   chmod +x "$bin_dir/oct"
   
   # Init config - Auto-detect API provider
