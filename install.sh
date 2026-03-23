@@ -35,6 +35,7 @@ main() {
   mkdir -p "$install_dir"
   cp -r "$tmp_dir/octclaw/lib" "$install_dir/"
   cp "$tmp_dir/octclaw/cli.sh" "$install_dir/"
+  cp "$tmp_dir/octclaw/oct" "$install_dir/"
   cp "$tmp_dir/octclaw/.env.example" "$install_dir/.env"
   
   local bin_dir="${HOME}/.local/bin"
@@ -43,6 +44,7 @@ main() {
   # Fix OCT_ROOT to point to install_dir instead of bin_dir
   sed -i.bak 's|^OCT_ROOT=.*|OCT_ROOT="${HOME}/.octclaw"|' "$bin_dir/oct"
   chmod +x "$bin_dir/oct"
+  chmod +x "$install_dir/oct"
   
   # Init config - Auto-detect API provider
   if [[ ! -f "$install_dir/config.json" ]]; then
