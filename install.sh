@@ -41,8 +41,23 @@ main() {
   cp "$tmp_dir/octclaw/oct" "$bin_dir/"
   chmod +x "$bin_dir/oct"
   
-  # Init config
-  [[ ! -f "$install_dir/config.json" ]] && printf '{"model":"gpt-4o","api_base":"https://api.openai.com/v1"}' > "$install_dir/config.json"
+  # Init config - Auto-detect API provider
+  if [[ ! -f "$install_dir/config.json" ]]; then
+    local config
+    if [[ -n "${DEEPSEEK_API_KEY:-}" ]]; then
+      config='{"model":"deepseek-chat","api_base":"https://api.deepseek.com"}'
+      _info "检测到DEEPSEEK_API_KEY，使用DeepSeek"
+    elif [[ -n "${OPENAI_API_KEY:-}" ]]; then
+      config='{"model":"gpt-4o","api_base":"https://api.openai.com/v1"}'
+      _info "检测到OPENAI_API_KEY，使用OpenAI GPT-4o"
+    else
+      config='{"model":"deepseek-chat","api_base":"https://api.deepseek.com"}'
+      _info "未检测到API密钥，已设置DeepSeek作为默认"
+      _info "配置OpenAI: export OPENAI_API_KEY='sk-xxx'"
+      _info "或配置DeepSeek: export DEEPSEEK_API_KEY='sk-xxx'"
+    fi
+    printf "$config" > "$install_dir/config.json"
+  fi
 
   # Add to PATH if needed
   if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
