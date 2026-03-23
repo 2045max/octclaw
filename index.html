@@ -3,65 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=octclaw_website.html">
-    <title>OctClaw - Redirecting...</title>
+    <title>OctClaw - Shell is all. Everything can be clawed.</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Claude Code inspired color palette - no blue */
+        :root {
+            --primary: #2A2A2A;
+            --secondary: #5A5A5A;
+            --accent: #E67E22;
+            --accent-light: #F39C12;
+            --background: #FFFFFF;
+            --surface: #F8F9FA;
+            --border: #E0E0E0;
+            --text: #333333;
+            --text-light: #666666;
+            --success: #27AE60;
+            --warning: #F1C40F;
+            --error: #E74C3C;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--background);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 40px 0 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            font-size: 40px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+
+        .tagline .accent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .install-command {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 500px;
+            margin-bottom: 24px;
+        }
+
+        .copy-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-light);
+        }
+
+        /* Main content */
+        main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        @media (min-width: 768px) {
+            main {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow-hover);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            margin-bottom: 16px;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .platform-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .platform-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .platform-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .platform-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .platform-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .code-block {
+            background: var(--primary);
+            color: #f0f0f0;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-block .comment {
+            color: #888;
+        }
+
+        .code-block .string {
+            color: #E67E22;
+        }
+
+        .code-block .keyword {
+            color: #F39C12;
+        }
+
+        /* Philosophy section */
+        .philosophy-quote {
+            font-style: italic;
+            color: var(--text-light);
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+            margin: 20px 0;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .footer-links {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: #F8F9FA;
-            color: #333;
-        }
-        .container {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        }
-        h1 {
-            font-size: 32px;
+            gap: 30px;
             margin-bottom: 20px;
-            color: #2A2A2A;
         }
-        p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #E67E22;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        a {
-            color: #E67E22;
+
+        .footer-links a {
+            color: var(--text);
             text-decoration: none;
-            font-weight: 500;
+            transition: color 0.2s;
         }
-        a:hover {
-            text-decoration: underline;
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .copyright {
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 28px;
+            }
+            
+            .logo-icon {
+                font-size: 36px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .platform-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="spinner"></div>
-        <h1>🐙 OctClaw</h1>
-        <p>Redirecting to octclaw.xyz website...</p>
-        <p>If you are not redirected automatically, <a href="octclaw_website.html">click here</a>.</p>
-    </div>
+    <header>
+        <div class="logo">
+            <span class="logo-icon">🐙</span>
+            <span>OctClaw</span>
+        </div>
+        
+        <div class="tagline">
+            <strong>Shell is all.</strong> <span class="accent">Everything can be clawed.</span> 🦞
+            <br>The universal AI agent that runs anywhere shell runs.
+        </div>
+        
+        <div class="install-command">
+            <code>curl -fsSL https://raw.githubusercontent.com/2045max/octclaw/main/install.sh | bash</code>
+            <button class="copy-btn" onclick="copyInstallCommand()">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-brain"></i> Philosophy
+            </h2>
+            <p class="philosophy-quote">
+                "Shell is already there. On your Mac, Linux server, Raspberry Pi, Android phone, IoT device. No install, no package managers, no compatibility issues.<br><br>
+                Shell is the universal runtime. OctClaw makes it a universal AI agent."
+            </p>
+            <p>OctClaw is built on a simple premise: <strong>if it runs shell, it can run an AI agent</strong>. From your laptop to a Raspberry Pi, from Android Termux to embedded systems — OctClaw brings AI assistance to every environment.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-bolt"></i> Quick Start
+            </h2>
+            <ol class="feature-list">
+                <li><strong>Install</strong> with one command</li>
+                <li><strong>Set API key</strong> (DeepSeek, OpenAI, or local models)</li>
+                <li><strong>Start using</strong> in interactive or one-shot mode</li>
+                <li><strong>Add skills</strong> to extend capabilities</li>
+            </ol>
+            
+            <div class="code-block">
+<span class="comment"># Set your API key</span>
+export DEEPSEEK_API_KEY=<span class="string">"sk-xxx"</span>
+
+<span class="comment"># Start interactive mode</span>
+oct
+
+<span class="comment"># Or use one-shot commands</span>
+oct <span class="string">"list files in current directory"</span>
+oct -s project <span class="string">"check system status"</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-microchip"></i> Universal Compatibility
+            </h2>
+            <p>OctClaw runs on <strong>shell 3.2+</strong>, which means it works everywhere:</p>
+            
+            <div class="platform-grid">
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fab fa-apple"></i></div>
+                    <div class="platform-name">macOS</div>
+                    <div class="platform-desc">2007+ versions</div>
+                </div>
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fab fa-linux"></i></div>
+                    <div class="platform-name">Linux</div>
+                    <div class="platform-desc">Any distribution</div>
+                </div>
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fab fa-android"></i></div>
+                    <div class="platform-name">Android</div>
+                    <div class="platform-desc">Termux, no root</div>
+                </div>
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fab fa-windows"></i></div>
+                    <div class="platform-name">Windows</div>
+                    <div class="platform-desc">WSL2, Git Bash</div>
+                </div>
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fas fa-server"></i></div>
+                    <div class="platform-name">Raspberry Pi</div>
+                    <div class="platform-desc">IoT & embedded</div>
+                </div>
+                <div class="platform-item">
+                    <div class="platform-icon"><i class="fas fa-cube"></i></div>
+                    <div class="platform-name">Containers</div>
+                    <div class="platform-desc">Alpine, Docker</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-comments"></i> Messaging Integration
+            </h2>
+            <p>Connect OctClaw to your favorite platforms:</p>
+            <ul class="feature-list">
+                <li><strong>Telegram</strong> — Personal and group chats</li>
+                <li><strong>飞书/钉钉</strong> — Enterprise collaboration</li>
+                <li><strong>Discord/Slack</strong> — Community and teams</li>
+                <li><strong>微信</strong> — Daily communication</li>
+                <li><strong>Email</strong> — Automated processing</li>
+            </ul>
+            <p>Connect once, access everywhere.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-tools"></i> Skills System
+            </h2>
+            <p>Extend OctClaw's capabilities with skills:</p>
+            <ul class="feature-list">
+                <li><strong>File Operations</strong> — Read, write, edit files</li>
+                <li><strong>Shell Execution</strong> — Run any command</li>
+                <li><strong>System Monitoring</strong> — Check status, resources</li>
+                <li><strong>IoT Control</strong> — GPIO, sensors, automation</li>
+                <li><strong>Web & APIs</strong> — HTTP requests, integration</li>
+            </ul>
+            
+            <div class="code-block">
+<span class="comment"># Create a new skill</span>
+oct <span class="string">"create a skill to monitor website uptime"</span>
+
+<span class="comment"># Use existing skills</span>
+oct <span class="string">"what skills are available?"</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-code"></i> Minimal & Efficient
+            </h2>
+            <ul class="feature-list">
+                <li><strong>Single file</strong> — ~1200 lines of shell script</li>
+                <li><strong>Zero dependencies</strong> — Just shell, jq, and curl</li>
+                <li><strong>&lt; 10MB RAM</strong> — Lightweight operation</li>
+                <li><strong>&lt; 50ms cold start</strong> — Instant response</li>
+                <li><strong>Self-modifying</strong> — Can update itself</li>
+                <li><strong>Session persistence</strong> — Remembers conversations</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/2045max/octclaw" target="_blank">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+            <a href="https://octclaw.xyz" target="_blank">
+                <i class="fas fa-globe"></i> Website
+            </a>
+            <a href="https://github.com/2045max/octclaw/issues" target="_blank">
+                <i class="fas fa-bug"></i> Issues
+            </a>
+        </div>
+        
+        <div class="copyright">
+            <p>© 2024 OctClaw. Shell is all. Everything can be clawed. 🦞</p>
+            <p>MIT License</p>
+        </div>
+    </footer>
+
+    <script>
+        function copyInstallCommand() {
+            const command = 'curl -fsSL https://raw.githubusercontent.com/2045max/octclaw/main/install.sh | bash';
+            navigator.clipboard.writeText(command).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
