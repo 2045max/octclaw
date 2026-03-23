@@ -1,0 +1,5 @@
+# OctClaw v2
+.env
+*.log
+*.tmp
+pi-session-*.html

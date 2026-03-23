@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OCTCLAW_VERSION="2.0.0"
+OCTCLAW_STATE="${OCTCLAW_STATE_DIR:-$HOME/.octclaw}"
+OCTCLAW_CONFIG="$OCTCLAW_STATE/config.json"
+
+# Resolve lib dir (works with symlinks)
+OCT_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")")" && pwd)"
+
+source "$OCT_ROOT/lib/utils.sh"
+source "$OCT_ROOT/lib/config.sh"
+source "$OCT_ROOT/lib/session.sh"
+source "$OCT_ROOT/lib/api.sh"
+source "$OCT_ROOT/lib/tools.sh"
+source "$OCT_ROOT/lib/prompt.sh"
+source "$OCT_ROOT/lib/agent.sh"
+source "$OCT_ROOT/lib/telegram.sh"
+source "$OCT_ROOT/lib/gateway.sh"
+source "$OCT_ROOT/lib/ui.sh"
+source "$OCT_ROOT/cli.sh"
+
+main "$@"
