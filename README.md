@@ -11,8 +11,8 @@ The universal AI agent that runs anywhere shell runs.
   <img src="https://img.shields.io/badge/deps-jq%20%2B%20curl-blue" alt="Dependencies" />
   <img src="https://img.shields.io/badge/RAM-%3C%2010MB-purple" alt="Memory" />
   <img src="https://img.shields.io/badge/万物皆可claw-🦞-orange" alt="Everything can be clawed" />
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT" />
+  <a href="https://opensource.org/licenses/Apache-2.0">
+    <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Apache 2.0" />
   </a>
 </p>
 
@@ -562,7 +562,7 @@ A: Yes! Create skills, improve documentation, report issues. The entire system i
 
 ## 📄 License
 
-MIT License. See [LICENSE](LICENSE).
+Apache 2.0 License. See [LICENSE](LICENSE).
 
 ---
 
@@ -591,8 +591,8 @@ MIT License. See [LICENSE](LICENSE).
   <img src="https://img.shields.io/badge/依赖-jq%20%2B%20curl-blue" alt="Dependencies" />
   <img src="https://img.shields.io/badge/内存-%3C%2010MB-purple" alt="Memory" />
   <img src="https://img.shields.io/badge/万物皆可claw-🦞-orange" alt="Everything can be clawed" />
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/许可证-MIT-yellow.svg" alt="MIT" />
+  <a href="https://opensource.org/licenses/Apache-2.0">
+    <img src="https://img.shields.io/badge/许可证-Apache_2.0-blue.svg" alt="Apache 2.0" />
   </a>
 </p>
 
@@ -1141,7 +1141,7 @@ A: 可以！创建技能，改进文档，报告问题。整个系统设计为�
 
 ## 📄 许可证
 
-MIT 许可证。查看 [LICENSE](LICENSE)。
+Apache 2.0 许可证。查看 [LICENSE](LICENSE)。
 
 ---
 

@@ -1,0 +1,17 @@
+{
+  "name": "octclaw",
+  "production_branch": "main",
+  "build": {
+    "command": "",
+    "cwd": "/"
+  },
+  "env": {
+    "production": {
+      "name": "octclaw-production",
+      "routes": [
+        { "pattern": "octclaw.xyz", "zone_name": "octclaw.xyz" },
+        { "pattern": "www.octclaw.xyz", "zone_name": "octclaw.xyz" }
+      ]
+    }
+  }
+}
