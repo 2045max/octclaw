@@ -78,7 +78,14 @@ OctClaw runs on **shell 3.2+**, which means it works on:
 ### Messaging Integration
 
 OctClaw can connect to your favorite messaging platforms:
-- **Telegram** — 个人和群组聊天
+
+#### **Telegram Bot**
+- **Auto-start** with `oct gateway` when `TELEGRAM_BOT_TOKEN` is set
+- **Multi-token support**: `TELEGRAM_BOT_TOKEN` > `TELEGRAM_TOKEN` > `OCTCLAW_TELEGRAM_TOKEN`
+- **Private & group chats** — 个人和群组聊天
+- **Persistent sessions** — Each chat gets its own session
+
+#### **Other Platforms** (Coming soon)
 - **飞书/钉钉** — 企业协作
 - **Discord/Slack** — 社区和团队
 - **微信** — 日常沟通
@@ -144,6 +151,25 @@ oct "create a skill to manage notes"
 
 # OctClaw will create the skill and teach you how to use it
 ```
+
+### 4. Telegram Bot (Optional)
+
+```bash
+# Set Telegram bot token
+export TELEGRAM_BOT_TOKEN="your_bot_token_here"
+
+# Start web UI with Telegram bot
+oct gateway
+
+# Or add to ~/.octclaw/.env for persistence
+echo 'TELEGRAM_BOT_TOKEN="your_bot_token_here"' >> ~/.octclaw/.env
+```
+
+**Getting a Telegram token**:
+1. Search for `@BotFather` in Telegram
+2. Send `/newbot` to create a new bot
+3. Get the token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)
+4. Start chatting with your bot in Telegram!
 
 ## 🛠️ Skills System
 
@@ -257,7 +283,7 @@ oct [flags] [message]
 oct doctor             Check dependencies
 oct config             View or edit config
 oct sessions           List sessions
-oct gateway [port]     Start web interface (default: 16869)
+oct gateway [port]     Start web interface + Telegram bot (default: 16869)
 ```
 
 ### Configuration Commands
