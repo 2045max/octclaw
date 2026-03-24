@@ -1,6 +1,7 @@
 _tg_api() {
   local method="$1" data="${2:-}"
-  local url="https://api.telegram.org/bot${TELEGRAM_TOKEN}/${method}"
+  local token="${TELEGRAM_BOT_TOKEN:-${TELEGRAM_TOKEN:-${OCTCLAW_TELEGRAM_TOKEN:-}}}"
+  local url="https://api.telegram.org/bot${token}/${method}"
   if [[ -n "$data" ]]; then
     curl -sS --max-time 60 -H "Content-Type: application/json" -d "$data" "$url" 2>/dev/null || true
   else
@@ -17,7 +18,8 @@ _tg_send() {
 }
 
 _telegram_poll() {
-  [[ -z "${TELEGRAM_TOKEN:-}" ]] && return
+  local token="${TELEGRAM_BOT_TOKEN:-${TELEGRAM_TOKEN:-${OCTCLAW_TELEGRAM_TOKEN:-}}}"
+  [[ -z "$token" ]] && { die "TELEGRAM_BOT_TOKEN not set"; return; }
 
   local me
   me="$(_tg_api "getMe")"

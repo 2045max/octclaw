@@ -8,9 +8,14 @@ gateway_start() {
   info "Listening on http://localhost:$port"
   info "Model: $(_resolve_model)  Base: $(_resolve_api_base)"
 
-  # Telegram: 有 token 就自动启动
-  if [[ -n "${TELEGRAM_TOKEN:-}" ]]; then
+  # Telegram: 有 token 就自动启动，没有就跳过
+  local tg_token="${TELEGRAM_BOT_TOKEN:-${TELEGRAM_TOKEN:-${OCTCLAW_TELEGRAM_TOKEN:-}}}"
+  if [[ -n "$tg_token" ]]; then
+    export TELEGRAM_BOT_TOKEN="$tg_token"
     _telegram_poll &
+    info "Telegram bot started"
+  else
+    debug "No TELEGRAM_BOT_TOKEN, skipping Telegram"
   fi
 
   local oct_bin
