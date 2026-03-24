@@ -41,14 +41,19 @@ session_build_messages() {
   local history
   history="$(session_load "$file" "$max")"
   printf '%s' "$history" | jq '
+    # Collect all tool_result IDs
+    [.[] | select(.type == "tool_result") | .tool_id] as $result_ids |
+    # Filter: keep user/assistant messages, and only paired tool_call/tool_result
     [.[] |
       if .type == "tool_call" then
-        {role:"assistant", content:null,
-         tool_calls:[{
-           id:.tool_id, type:"function",
-           function:{name:.tool_name,
-             arguments:(if (.tool_input|type)=="string" then .tool_input else (.tool_input|tostring) end)}
-         }]}
+        if (.tool_id | IN($result_ids[])) then
+          {role:"assistant", content:null,
+           tool_calls:[{
+             id:.tool_id, type:"function",
+             function:{name:.tool_name,
+               arguments:(if (.tool_input|type)=="string" then .tool_input else (.tool_input|tostring) end)}
+           }]}
+        else empty end
       elif .type == "tool_result" then
         {role:"tool", tool_call_id:.tool_id, content:(.content // "")}
       else
