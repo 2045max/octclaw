@@ -260,10 +260,12 @@ When running `oct` (interactive mode), you can use:
 /model <name>   Switch model (gpt-4o, deepseek-chat, etc.)
 /session <name> Switch session
 /sessions       List all sessions
+/branch <name>  Branch current session
+/merge <name>   Merge session into current
 /clear          Clear current session
 /compact        Keep only last 20 messages
-/skills         List available skills
-/config         Show configuration
+/tools          List available tools
+/help           Show help
 ```
 
 ### CLI Commands
@@ -283,6 +285,9 @@ oct [flags] [message]
 oct doctor             Check dependencies
 oct config             View or edit config
 oct sessions           List sessions
+oct session branch <n> Branch current session
+oct session merge <n>  Merge session into target
+oct session info <n>   Show session metadata
 oct gateway [port]     Start web interface + Telegram bot (default: 16869)
 ```
 
@@ -308,33 +313,52 @@ export MODEL="deepseek-chat"
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     OctClaw Architecture                     │
+│                  OctClaw v3.0 Architecture                   │
 └─────────────────────────────────────────────────────────────┘
 
-Core Components:
-├── Agent Engine          # LLM interaction, tool calling
-├── Skill System          # Extensible capabilities
-├── Session Manager       # Conversation persistence
-├── Configuration         # Settings and API keys
-└── CLI Interface         # User interaction
+Directory Structure:
+oct                          # Entry point (<100 lines dispatch)
+├── core/                    # Minimal core
+│   ├── utils.sh             # die/info/warn/debug
+│   └── dispatch.sh          # Command router
+├── commands/                # One file per command
+│   ├── chat.sh              # Interactive + print mode
+│   ├── config.sh            # Configuration management
+│   ├── doctor.sh            # Health check
+│   ├── gateway.sh           # HTTP server
+│   ├── session.sh           # Branch/merge/info
+│   └── sessions.sh          # List sessions
+├── services/                # Reusable business logic
+│   ├── agent.sh             # LLM agent loop
+│   ├── api.sh               # API calls with retry
+│   ├── config.sh            # Config read/write
+│   ├── session.sh           # Session + metadata + branches
+│   ├── prompt.sh            # System prompt builder
+│   ├── tools.sh             # Tool dispatch
+│   ├── tools/               # Tool implementations
+│   │   ├── read.sh write.sh edit.sh
+│   │   ├── shell.sh grep.sh find.sh
+│   ├── telegram.sh          # Telegram bot
+│   ├── gateway.sh           # HTTP gateway
+│   └── ui.sh                # Terminal UI
+├── plugins/                 # Extension framework
+│   ├── base.sh              # Plugin API (register commands/tools)
+│   └── loader.sh            # Auto-load plugins
+└── lib/                     # Legacy (backward compat)
 
 Data Structure:
 ~/.octclaw/
-├── config.json          # Configuration
-├── system.md           # Custom system prompt
-├── .env                # Environment variables
-├── skills/             # Global skills
-├── sessions/           # Conversation history
-│   ├── default.jsonl
+├── config.json              # Configuration
+├── system.md                # Custom system prompt
+├── .env                     # Environment variables
+├── skills/                  # Global skills
+├── sessions/                # Conversation history
+│   ├── default.jsonl        # Messages
+│   ├── default.meta.json    # Metadata (created, updated, parent)
 │   ├── work.jsonl
+│   ├── work--branch-1.jsonl # Session branch
 │   └── ...
-└── projects/           # Project-specific data
-    ├── myapp/
-    │   ├── .octclaw/
-    │   │   ├── skills/     # Project skills
-    │   │   └── context.md  # Project context
-    │   └── ...
-    └── ...
+└── plugins/                 # User plugins
 ```
 
 ### Agent Loop
@@ -462,8 +486,22 @@ oct -s personal "organize photos"
 # Continue where you left off
 oct -c "what's next?"
 
-# List all sessions
+# List all sessions (shows metadata)
 oct sessions
+
+# Branch a session to explore alternatives
+oct session branch my-session experiment-1
+
+# Merge a branch back
+oct session merge experiment-1 my-session
+
+# View session metadata
+oct session info my-session
+
+# Interactive branching
+oct
+> /branch experiment-2
+> /merge experiment-2
 ```
 
 ## 🤝 Community & Ecosystem
@@ -490,14 +528,29 @@ oct "what skills are available?"
 - **Data Processing** — CSV/JSON manipulation, analysis
 - **Messaging** — Telegram, Discord, WeChat integration
 
-### Skill Categories
+## 🔌 Plugin System
 
-- **System Administration** — Monitoring, backups, security
-- **Development** — Code generation, testing, deployment
-- **Personal Productivity** — Notes, reminders, organization
-- **IoT & Hardware** — GPIO control, sensor reading
-- **Web & APIs** — HTTP requests, API integration
-- **Data Processing** — CSV/JSON manipulation, analysis
+OctClaw v3.0 includes a plugin framework for extending functionality without modifying core code.
+
+### Creating a Plugin
+
+Add a `.sh` file to `~/.octclaw/plugins/`:
+
+```bash
+# ~/.octclaw/plugins/hello.sh
+plugin_init() {
+  plugin_register_command "hello" "_plugin_hello"
+}
+
+_plugin_hello() {
+  echo "Hello from plugin!"
+}
+```
+
+Plugins are auto-loaded on startup and can:
+- **Register slash commands** — Add new `/commands` to interactive mode
+- **Register tools** — Add new tools for the AI agent to use
+- **Hook into events** — React to agent lifecycle events
 
 ## 🔒 Security Considerations
 
@@ -839,10 +892,12 @@ OctClaw 自动发现以下位置的技能：
 /model <name>   切换模型 (gpt-4o, deepseek-chat 等)
 /session <name> 切换会话
 /sessions       列出所有会话
+/branch <name>  分支当前会话
+/merge <name>   合并会话到当前
 /clear          清空当前会话
 /compact        只保留最近 20 条消息
-/skills         列出可用技能
-/config         显示配置
+/tools          列出可用工具
+/help           显示帮助
 ```
 
 ### CLI 命令
@@ -862,6 +917,9 @@ oct [flags] [message]
 oct doctor             检查依赖
 oct config             查看或编辑配置
 oct sessions           列出会话
+oct session branch <n> 分支会话
+oct session merge <n>  合并会话
+oct session info <n>   查看会话元数据
 oct gateway [端口]     启动网页界面 (默认: 16869)
 ```
 
@@ -887,33 +945,43 @@ export MODEL="deepseek-chat"
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     OctClaw 架构                             │
+│                  OctClaw v3.0 架构                           │
 └─────────────────────────────────────────────────────────────┘
 
-核心组件:
-├── 代理引擎          # LLM 交互，工具调用
-├── 技能系统          # 可扩展能力
-├── 会话管理器        # 对话持久化
-├── 配置              # 设置和 API 密钥
-└── CLI 界面          # 用户交互
+目录结构:
+oct                          # 入口点 (<100行调度)
+├── core/                    # 极简核心
+│   ├── utils.sh             # 日志工具
+│   └── dispatch.sh          # 命令路由
+├── commands/                # 每个命令一个文件
+│   ├── chat.sh              # 交互 + 打印模式
+│   ├── config.sh            # 配置管理
+│   ├── doctor.sh            # 健康检查
+│   ├── session.sh           # 分支/合并/信息
+│   └── ...
+├── services/                # 可复用业务逻辑
+│   ├── agent.sh             # LLM 代理循环
+│   ├── api.sh               # API 调用 + 重试
+│   ├── session.sh           # 会话 + 元数据 + 分支
+│   ├── tools/               # 工具实现
+│   └── ...
+├── plugins/                 # 扩展框架
+│   ├── base.sh              # 插件 API
+│   └── loader.sh            # 自动加载插件
+└── lib/                     # 旧版 (向后兼容)
 
 数据结构:
 ~/.octclaw/
-├── config.json          # 配置
-├── system.md           # 自定义系统提示词
-├── .env                # 环境变量
-├── skills/             # 全局技能
-├── sessions/           # 对话历史
-│   ├── default.jsonl
-│   ├── work.jsonl
+├── config.json              # 配置
+├── system.md                # 自定义系统提示词
+├── .env                     # 环境变量
+├── skills/                  # 全局技能
+├── sessions/                # 对话历史
+│   ├── default.jsonl        # 消息
+│   ├── default.meta.json    # 元数据 (创建时间, 更新时间, 父会话)
+│   ├── work--branch-1.jsonl # 会话分支
 │   └── ...
-└── projects/           # 项目特定数据
-    ├── myapp/
-    │   ├── .octclaw/
-    │   │   ├── skills/     # 项目技能
-    │   │   └── context.md  # 项目上下文
-    │   └── ...
-    └── ...
+└── plugins/                 # 用户插件
 ```
 
 ### 代理循环
@@ -1041,8 +1109,22 @@ oct -s personal "整理照片"
 # 继续上次的工作
 oct -c "接下来是什么？"
 
-# 列出所有会话
+# 列出所有会话 (显示元数据)
 oct sessions
+
+# 分支会话以探索替代方案
+oct session branch my-session experiment-1
+
+# 合并分支回来
+oct session merge experiment-1 my-session
+
+# 查看会话元数据
+oct session info my-session
+
+# 交互式分支
+oct
+> /branch experiment-2
+> /merge experiment-2
 ```
 
 ## 🤝 社区与生态系统
@@ -1069,14 +1151,29 @@ oct "有哪些可用的技能？"
 - **数据处理** — CSV/JSON 操作、分析
 - **消息集成** — Telegram、Discord、微信集成
 
-### 技能类别
+## 🔌 插件系统
 
-- **系统管理** — 监控、备份、安全
-- **开发** — 代码生成、测试、部署
-- **个人生产力** — 笔记、提醒、组织
-- **IoT & 硬件** — GPIO 控制、传感器读取
-- **Web & API** — HTTP 请求、API 集成
-- **数据处理** — CSV/JSON 操作、分析
+OctClaw v3.0 包含插件框架，无需修改核心代码即可扩展功能。
+
+### 创建插件
+
+在 `~/.octclaw/plugins/` 中添加 `.sh` 文件：
+
+```bash
+# ~/.octclaw/plugins/hello.sh
+plugin_init() {
+  plugin_register_command "hello" "_plugin_hello"
+}
+
+_plugin_hello() {
+  echo "来自插件的问候！"
+}
+```
+
+插件在启动时自动加载，可以：
+- **注册斜杠命令** — 在交互模式中添加新的 `/命令`
+- **注册工具** — 为 AI 代理添加新工具
+- **钩入事件** — 响应代理生命周期事件
 
 ## 🔒 安全考虑
 
