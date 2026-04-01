@@ -1,23 +1,127 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OCTCLAW_VERSION="2.0.0"
+OCTCLAW_VERSION="3.0.0"
 OCTCLAW_STATE="${OCTCLAW_STATE_DIR:-$HOME/.octclaw}"
 OCTCLAW_CONFIG="$OCTCLAW_STATE/config.json"
-
-# Resolve lib dir - use install directory
 OCT_ROOT="${OCTCLAW_STATE_DIR:-$HOME/.octclaw}"
 
-source "$OCT_ROOT/lib/utils.sh"
-source "$OCT_ROOT/lib/config.sh"
-source "$OCT_ROOT/lib/session.sh"
-source "$OCT_ROOT/lib/api.sh"
-source "$OCT_ROOT/lib/tools.sh"
-source "$OCT_ROOT/lib/prompt.sh"
-source "$OCT_ROOT/lib/agent.sh"
-source "$OCT_ROOT/lib/telegram.sh"
-source "$OCT_ROOT/lib/gateway.sh"
-source "$OCT_ROOT/lib/ui.sh"
-source "$OCT_ROOT/cli.sh"
+# --- Load core ---
+source "$OCT_ROOT/core/utils.sh"
+source "$OCT_ROOT/core/dispatch.sh"
+
+# --- Load services ---
+source "$OCT_ROOT/services/config.sh"
+source "$OCT_ROOT/services/session.sh"
+source "$OCT_ROOT/services/api.sh"
+source "$OCT_ROOT/services/tools.sh"
+source "$OCT_ROOT/services/prompt.sh"
+source "$OCT_ROOT/services/agent.sh"
+source "$OCT_ROOT/services/telegram.sh"
+source "$OCT_ROOT/services/gateway.sh"
+source "$OCT_ROOT/services/ui.sh"
+
+# --- Load plugins ---
+source "$OCT_ROOT/plugins/base.sh"
+source "$OCT_ROOT/plugins/loader.sh"
+plugins_load
+
+# --- Usage ---
+_usage() {
+  cat <<EOF
+🐙 OctClaw v${OCTCLAW_VERSION} — AI coding assistant in pure Bash
+
+Usage:
+  oct [flags] [message]        Chat (interactive if no message)
+  oct <command> [args]         Run a command
+
+Flags:
+  -m, --model <name>           Model name (default: gpt-4o)
+  -s, --session <id>           Session ID (default: default)
+  -c, --continue               Continue most recent session
+  -p, --print                  Force non-interactive output
+      --debug                  Debug output
+  -h, --help                   Show this help
+  -v, --version                Show version
+
+Commands:
+  doctor                       Check dependencies
+  config [set k v | get k]     View or edit config
+  sessions                     List sessions
+  session <branch|merge|info>  Manage session branches
+  gateway [port]               Start HTTP server
+
+Interactive /commands:
+  /model /session /sessions /branch /merge /clear /compact /tools /help /exit
+EOF
+}
+
+# --- Find latest session ---
+_latest_session() {
+  local dir
+  dir="$(_sessions_dir)"
+  local latest
+  latest="$(ls -t "$dir"/*.jsonl 2>/dev/null | head -1)"
+  if [[ -n "$latest" ]]; then
+    basename "$latest" .jsonl
+  else
+    echo "default"
+  fi
+}
+
+# --- Main ---
+main() {
+  # Try command dispatch first
+  case "${1:-}" in
+    doctor|config|sessions|session|gateway)
+      local cmd="$1"; shift
+      source "$OCT_ROOT/commands/${cmd}.sh"
+      "cmd_${cmd}" "$@"
+      return
+      ;;
+    _gateway_handle) _load_env; _gateway_handle; return ;;
+  esac
+
+  # Parse flags
+  local flag_model="" flag_session="" flag_continue=0 flag_print=0
+  local messages=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -m|--model)     flag_model="$2"; shift 2 ;;
+      -s|--session)   flag_session="$2"; shift 2 ;;
+      -c|--continue)  flag_continue=1; shift ;;
+      -p|--print)     flag_print=1; shift ;;
+      --debug)        export OCTCLAW_DEBUG=1; shift ;;
+      -h|--help)      _usage; return ;;
+      -v|--version)   echo "$OCTCLAW_VERSION"; return ;;
+      -*)             die "Unknown flag: $1 (try oct --help)" ;;
+      *)              messages+=("$1"); shift ;;
+    esac
+  done
+
+  # Setup
+  config_init
+  _load_env
+  [[ -n "$flag_model" ]] && export MODEL="$flag_model"
+
+  local sid="default"
+  if [[ -n "$flag_session" ]]; then
+    sid="$flag_session"
+  elif (( flag_continue )); then
+    sid="$(_latest_session)"
+    info "Continuing session: $sid"
+  fi
+
+  # Route to chat command
+  source "$OCT_ROOT/commands/chat.sh"
+  if (( ${#messages[@]} > 0 )); then
+    cmd_chat "$sid" "${messages[*]}"
+  elif (( flag_print )); then
+    die "No message provided for print mode"
+  else
+    cmd_chat "$sid"
+  fi
+}
 
 main "$@"
